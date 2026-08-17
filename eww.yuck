@@ -54,19 +54,19 @@
            :tooltip "${daily_verse}")))
 
 ;; Right Metrics Module
-(defwidget right_metrics []
+(defwidget right_metrics [mon_id]
   (box :class "modules-right" :orientation "h" :space-evenly false :spacing 8
     (label :class "stat net" :text "  ${round(EWW_NET.wlan0.NET_DOWN / 1024, 0)}K   ${round(EWW_NET.wlan0.NET_UP / 1024, 0)}K")
     (eventbox :cursor "pointer"
       (button :class {net_info.connected ? "stat net-btn connected" : "stat net-btn disconnected"}
-              :onclick "~/.config/eww/scripts/toggle-wifi.py &"
+              :onclick "eww open --toggle wifi_window_${mon_id} &"
               :tooltip "Connected: ${net_info.ssid}"
               "${net_info.icon} ${net_info.label}"))
     (label :class "stat cpu" :text "CPU ${round(EWW_CPU.avg, 0) < 10 ? '  ' : (round(EWW_CPU.avg, 0) < 100 ? ' ' : '')}${round(EWW_CPU.avg, 0)}%")
     (label :class "stat ram" :text "RAM ${round(EWW_RAM.used_mem_perc, 0) < 10 ? '  ' : (round(EWW_RAM.used_mem_perc, 0) < 100 ? ' ' : '')}${round(EWW_RAM.used_mem_perc, 0)}%")
     (eventbox :cursor "pointer"
       (button :class {volume == "MUTED" ? "stat vol muted" : "stat vol"}
-              :onclick "~/.config/eww/scripts/toggle-volume.py &"
+              :onclick "eww open --toggle volume_window_${mon_id} &"
               "${volume == 'MUTED' ? '󰝟 Muted' : '󰕾 ' + (strlength(volume) == 1 ? '  ' : (strlength(volume) == 2 ? ' ' : '')) + volume + '%'}"))
     (label :class "stat bat" :text "󰁹 ${EWW_BATTERY.BAT1.capacity < 10 ? '  ' : (EWW_BATTERY.BAT1.capacity < 100 ? ' ' : '')}${EWW_BATTERY.BAT1.capacity}%")
     (eventbox :cursor "pointer"
@@ -80,7 +80,8 @@
   (box :class "bar-box" :orientation "h" :space-evenly false
     (workspaces_accordion :ws_source ws_data :mon_id mon_id)
     (box :hexpand true (focus_marquee))
-    (right_metrics)))
+    (right_metrics :mon_id mon_id)))
+
 
 ;; Monitor 0 Bar Window
 (defwindow bar_0
