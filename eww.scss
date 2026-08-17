@@ -1,0 +1,300 @@
+* {
+  all: unset;
+  font-family: "JetBrainsMono Nerd Font", monospace;
+  font-weight: bold;
+  font-size: 13px;
+}
+
+/* GTK Hover Tooltip Theme */
+tooltip {
+  background-color: #1F2329;
+  border: none;
+  border-radius: 0px;
+  padding: 8px 30px;
+  
+  label {
+    color: #B6FF2E;
+    font-style: italic;
+    font-weight: normal;
+  }
+}
+
+.bar-box {
+  background-color: #1F2329;
+  border: none;
+  border-radius: 0px;
+  padding: 2px 5px;
+}
+
+/* Outer Workspace Container */
+.outer-ws-container {
+  background-color: #292E36;
+  border-radius: 4px;
+  padding: 2px 2px;
+}
+
+.ws-container {
+  background-color: transparent;
+  padding: 0;
+}
+
+.add-ws-container {
+  background-color: transparent;
+  padding: 0;
+}
+
+.ws-btn {
+  color: #B6FF2E;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 2px;
+  background-color: transparent;
+
+  &.active {
+    background-color: #3e4451;
+    color: #B6FF2E;
+  }
+
+  &:hover {
+    background-color: #4f5666;
+  }
+
+  &.add-btn {
+    padding: 2px 6px;
+    color: #B6FF2E;
+  }
+}
+
+/* Windows Container */
+.win-container {
+  background-color: #292E36;
+  border-radius: 4px;
+  padding: 2px 2px;
+}
+
+.win-icon-btn {
+  color: #B6FF2E;
+  padding: 2px 6px;
+  border-radius: 2px;
+  background-color: transparent;
+
+  &.active {
+    background-color: #3e4451;
+    color: #B6FF2E;
+  }
+
+  &:hover {
+    background-color: #4f5666;
+    color: #B6FF2E;
+  }
+
+  &:active {
+    opacity: 0.5;
+    background-color: #4f5666;
+  }
+}
+
+/* Marquee Verse Label */
+.marquee-wrapper {
+  padding: 0 10px;
+}
+
+.marquee-text {
+  color: #B6FF2E;
+  font-style: italic;
+  font-weight: normal;
+}
+
+/* Metrics & Clock */
+.stat {
+  color: #B6FF2E;
+  background-color: #292E36;
+  padding: 2px 8px;
+  border-radius: 0px;
+
+  &.vol {
+    &:hover {
+      background-color: #3e4451;
+    }
+    &.muted {
+      color: #5c6370;
+      background-color: #1c2026;
+    }
+  }
+
+  &.net-btn {
+    &:hover {
+      background-color: #3e4451;
+    }
+  }
+}
+
+.clock {
+  &:hover {
+    background-color: #3e4451;
+  }
+}
+
+.cal-box {
+  background-color: #1F2329;
+  border: none;
+  border-radius: 0px;
+  padding: 10px;
+  color: #B6FF2E;
+}
+
+/* Volume Window Popup Styling */
+.vol-box {
+  background-color: #1F2329;
+  border: none;
+  border-radius: 0px;
+  padding: 10px;
+  color: #B6FF2E;
+}
+
+.vol-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: #B6FF2E;
+}
+
+.vol-close {
+  color: #B6FF2E;
+  font-weight: bold;
+  padding: 0 4px;
+  &:hover {
+    color: #ff6c6b;
+  }
+}
+
+.vol-mute-btn {
+  background-color: #292E36;
+  color: #B6FF2E;
+  font-size: 16px;
+  padding: 6px 10px;
+  border-radius: 0px;
+
+  &.muted {
+    color: #ff6c6b;
+  }
+
+  &:hover {
+    background-color: #3e4451;
+  }
+}
+
+.vol-scale-slider {
+  margin-top: 6px;
+  margin-bottom: 6px;
+
+  trough {
+    background-color: #292E36;
+    border-radius: 0px;
+    min-height: 8px;
+  }
+
+  highlight {
+    background-color: #B6FF2E;
+    border-radius: 0px;
+  }
+
+  slider {
+    background-color: #B6FF2E;
+    border-radius: 0px;
+    min-width: 14px;
+    min-height: 14px;
+  }
+}
+
+.vol-device-header {
+  font-size: 12px;
+  font-weight: bold;
+  color: #B6FF2E;
+  margin-top: 4px;
+}
+
+.vol-device-item {
+  background-color: #292E36;
+  padding: 6px 10px;
+  border-radius: 4px;
+  color: #B6FF2E;
+
+  &.active {
+    background-color: #333943;
+    border: none;
+  }
+
+  &:hover {
+    background-color: #3e4451;
+  }
+}
+
+.vol-device-name {
+  color: #B6FF2E;
+  font-size: 12px;
+}
+
+.vol-device-check {
+  color: #B6FF2E;
+  font-weight: bold;
+}
+
+.vol-gui-btn {
+  background-color: #292E36;
+  color: #B6FF2E;
+  padding: 6px 10px;
+  border-radius: 4px;
+  margin-top: 4px;
+  &:hover {
+    background-color: #3e4451;
+  }
+}
+
+/* Wi-Fi Window Popup Styling */
+.wifi-box {
+  background-color: #1F2329;
+  border: none;
+  border-radius: 8px;
+  padding: 10px;
+  color: #B6FF2E;
+}
+
+.wifi-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: #B6FF2E;
+}
+
+.wifi-close {
+  color: #B6FF2E;
+  font-weight: bold;
+  padding: 0 4px;
+  &:hover {
+    color: #ff6c6b;
+  }
+}
+
+.wifi-item {
+  background-color: #292E36;
+  padding: 6px 10px;
+  border-radius: 4px;
+  color: #B6FF2E;
+
+  &.connected {
+    background-color: #333943;
+    border: none;
+  }
+
+  &:hover {
+    background-color: #3e4451;
+  }
+}
+
+.wifi-item-name {
+  color: #B6FF2E;
+}
+
+.wifi-item-sig {
+  color: #B6FF2E;
+  font-size: 11px;
+}

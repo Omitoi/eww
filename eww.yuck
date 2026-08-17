@@ -1,0 +1,177 @@
+;; Listeners per monitor output
+(deflisten ws_data_0 :initial "{\"active\": 1, \"workspaces\": []}" "~/.config/eww/scripts/get-workspaces.py 0")
+(deflisten ws_data_1 :initial "{\"active\": 1, \"workspaces\": []}" "~/.config/eww/scripts/get-workspaces.py 1")
+
+;; Daily Verse Poller
+(defpoll daily_verse :interval "12h" "~/.config/eww/scripts/get-verse.py")
+
+;; System Metrics & Network Pollers
+(defpoll net_info :interval "2s" :initial "{\"connected\": false, \"ssid\": \"\", \"icon\": \"󰤮\", \"label\": \"Disconnected\"}" "~/.config/eww/scripts/get-net.py")
+(defpoll wifi_list :interval "5s" :initial "[]" "~/.config/eww/scripts/get-wifi-list.py")
+(defpoll volume :interval "1s" "wpctl get-volume @DEFAULT_AUDIO_SINK@ | awk '{if ($3 == \"[MUTED]\") print \"MUTED\"; else print int($2*100)}'")
+(defpoll time_str :interval "1s" "date '+%H:%M %d/%m/%Y'")
+(defpoll time_day :interval "1h" "date '+%d'")
+(defpoll time_month :interval "1h" "date '+%m'")
+(defpoll time_year :interval "1h" "date '+%Y'")
+(defpoll update_count :interval "30m" "~/.config/eww/scripts/updates.sh")
+(defpoll vol_steps :interval "1s" :initial "[]" "~/.config/eww/scripts/get-vol-steps.py $(wpctl get-volume @DEFAULT_AUDIO_SINK@ | awk '{if ($3 == \"[MUTED]\") print \"MUTED\"; else print int($2*100)}')")
+(defpoll audio_sinks :interval "3s" :initial "[]" "~/.config/eww/scripts/get-audio-sinks.py")
+
+;; Reusable Workspaces Accordion Widget (Native GTK DND Bar)
+(defwidget workspaces_accordion [ws_source mon_id]
+  (box :class "left-modules" :orientation "h" :space-evenly false :spacing 8
+    (box :class "outer-ws-container" :orientation "h" :space-evenly false :spacing 4
+      (box :class "ws-container" :orientation "h" :space-evenly false :spacing 4
+        (for ws in {ws_source.workspaces}
+          (eventbox :cursor "pointer"
+            (button :class {ws.id == ws_source.active ? "ws-btn active" : "ws-btn"}
+                    :onclick "~/.config/eww/scripts/select-workspace.py ${ws.id} ${mon_id} &"
+                    "${ws.id}"))))
+      (box :class "plus-container" :orientation "h" :space-evenly false
+        (eventbox :cursor "pointer"
+          (button :class "ws-btn add-btn"
+                  :onclick "~/.config/eww/scripts/select-workspace.py ${ws_source.next_ws} ${mon_id} &"
+                  :tooltip "Add workspace"
+                  "+"))))
+    (revealer :transition "slideleft"
+              :reveal {arraylength(ws_source.active_windows) > 0}
+              :duration "250ms"
+      (box :class "win-container" :orientation "h" :space-evenly false :spacing 4
+        (for win in {ws_source.active_windows}
+          (eventbox :cursor "pointer"
+            (button :class {win.is_master ? "win-icon-btn active" : "win-icon-btn"}
+                    :onclick "~/.config/eww/scripts/focus-window.py ${win.address} &"
+                    :tooltip "${win.title}"
+                    "${win.icon}")))))))
+
+;; Focus: Static Truncated Verse with Styled Tooltip
+(defwidget focus_marquee []
+  (box :class "marquee-wrapper" :halign "center" :valign "center"
+    (label :class "marquee-text"
+           :limit-width 55
+           :show-truncated true
+           :text "${daily_verse}"
+           :tooltip "${daily_verse}")))
+
+;; Right Metrics Module
+(defwidget right_metrics []
+  (box :class "modules-right" :orientation "h" :space-evenly false :spacing 8
+    (label :class "stat net" :text "  ${round(EWW_NET.wlan0.NET_DOWN / 1024, 0)}K   ${round(EWW_NET.wlan0.NET_UP / 1024, 0)}K")
+    (eventbox :cursor "pointer"
+      (button :class {net_info.connected ? "stat net-btn connected" : "stat net-btn disconnected"}
+              :onclick "~/.config/eww/scripts/toggle-wifi.py &"
+              :tooltip "Connected: ${net_info.ssid}"
+              "${net_info.icon} ${net_info.label}"))
+    (label :class "stat cpu" :text "CPU ${round(EWW_CPU.avg, 0) < 10 ? '  ' : (round(EWW_CPU.avg, 0) < 100 ? ' ' : '')}${round(EWW_CPU.avg, 0)}%")
+    (label :class "stat ram" :text "RAM ${round(EWW_RAM.used_mem_perc, 0) < 10 ? '  ' : (round(EWW_RAM.used_mem_perc, 0) < 100 ? ' ' : '')}${round(EWW_RAM.used_mem_perc, 0)}%")
+    (eventbox :cursor "pointer"
+      (button :class {volume == "MUTED" ? "stat vol muted" : "stat vol"}
+              :onclick "~/.config/eww/scripts/toggle-volume.py &"
+              "${volume == 'MUTED' ? '󰝟 Muted' : '󰕾 ' + (strlength(volume) == 1 ? '  ' : (strlength(volume) == 2 ? ' ' : '')) + volume + '%'}"))
+    (label :class "stat bat" :text "󰁹 ${EWW_BATTERY.BAT1.capacity < 10 ? '  ' : (EWW_BATTERY.BAT1.capacity < 100 ? ' ' : '')}${EWW_BATTERY.BAT1.capacity}%")
+    (eventbox :cursor "pointer"
+      (button :class "stat updates" :onclick "~/.config/eww/scripts/update-sys.sh &"
+              "󰮪 ${(strlength(update_count) == 1 ? '  ' : (strlength(update_count) == 2 ? ' ' : '')) + update_count}"))
+    (eventbox :cursor "pointer"
+      (button :class "stat clock" :onclick "~/.config/eww/scripts/toggle-calendar.py &" "${time_str}"))))
+
+;; Main Bar Layout (Accepts workspace data per monitor)
+(defwidget bar_layout [ws_data mon_id]
+  (box :class "bar-box" :orientation "h" :space-evenly false
+    (workspaces_accordion :ws_source ws_data :mon_id mon_id)
+    (box :hexpand true (focus_marquee))
+    (right_metrics)))
+
+;; Monitor 0 Bar Window
+(defwindow bar_0
+  :monitor 0
+  :geometry (geometry :x "0%" :y "0px" :width "100%" :height "36px" :anchor "top center")
+  :stacking "fg"
+  :exclusive true
+  (bar_layout :ws_data ws_data_0 :mon_id 0))
+
+;; Monitor 1 Bar Window
+(defwindow bar_1
+  :monitor 1
+  :geometry (geometry :x "0%" :y "0px" :width "100%" :height "36px" :anchor "top center")
+  :stacking "fg"
+  :exclusive true
+  (bar_layout :ws_data ws_data_1 :mon_id 1))
+
+;; Calendar Popup Windows per monitor
+(defwindow calendar_window_0
+  :monitor 0
+  :geometry (geometry :x "5px" :y "5px" :anchor "top right")
+  (box :class "cal-box"
+    (calendar :show-details true :show-heading true :day time_day :month time_month :year time_year)))
+
+(defwindow calendar_window_1
+  :monitor 1
+  :geometry (geometry :x "5px" :y "5px" :anchor "top right")
+  (box :class "cal-box"
+    (calendar :show-details true :show-heading true :day time_day :month time_month :year time_year)))
+
+;; Instant Volume Popup Content Widget
+(defwidget volume_content [close_cmd]
+  (box :class "vol-box" :orientation "v" :space-evenly false :spacing 12
+    (box :orientation "h" :space-evenly false
+      (label :class "vol-title" :text "Volume Control" :hexpand true :halign "start")
+      (button :class "vol-close" :onclick close_cmd "󰅖"))
+    (box :orientation "h" :space-evenly false :spacing 12 :valign "center"
+      (button :class {volume == "MUTED" ? "vol-mute-btn muted" : "vol-mute-btn"}
+              :onclick "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle &"
+              :tooltip {volume == "MUTED" ? "Unmute" : "Mute"}
+              "${volume == 'MUTED' ? '󰝟' : '󰕾'}")
+      (scale :class "vol-scale-slider"
+             :hexpand true
+             :min 0
+             :max 101
+             :value {volume == "MUTED" ? 0 : volume}
+             :onchange "wpctl set-volume @DEFAULT_AUDIO_SINK@ {}% &"))
+    (label :class "vol-device-header" :text "Audio Outputs" :halign "start")
+    (box :orientation "v" :spacing 6
+      (for sink in audio_sinks
+        (button :class {sink.default ? "vol-device-item active" : "vol-device-item"}
+                :onclick "wpctl set-default ${sink.id} &"
+          (box :orientation "h" :space-evenly false
+            (label :class "vol-device-name" :text "${sink.name}" :hexpand true :halign "start")
+            (label :class "vol-device-check" :text "${sink.default ? '✓' : ''}")))))
+    (button :class "vol-gui-btn"
+            :onclick "pavucontrol &"
+            "Open Audio Mixer")))
+
+;; Volume Selector Popup Windows per monitor
+(defwindow volume_window_0
+  :monitor 0
+  :geometry (geometry :x "150px" :y "0px" :width "620px" :anchor "top right")
+  (volume_content :close_cmd "eww close volume_window_0"))
+
+(defwindow volume_window_1
+  :monitor 1
+  :geometry (geometry :x "150px" :y "0px" :width "620px" :anchor "top right")
+  (volume_content :close_cmd "eww close volume_window_1"))
+
+;; Wi-Fi Popup Content Widget
+(defwidget wifi_content [close_cmd]
+  (box :class "wifi-box" :orientation "v" :space-evenly false :spacing 8
+    (box :class "wifi-header" :orientation "h" :space-evenly false
+      (label :class "wifi-title" :text "Available Wi-Fi Networks" :hexpand true)
+      (button :class "wifi-close" :onclick close_cmd "󰅖"))
+    (box :orientation "v" :spacing 6
+      (for net in wifi_list
+        (button :class {net.connected ? "wifi-item connected" : "wifi-item"}
+                :onclick "~/.config/eww/scripts/connect-wifi.sh '${net.name}' &"
+          (box :orientation "h" :space-evenly false
+            (label :class "wifi-item-name" :text "${net.name}" :hexpand true :halign "start")
+            (label :class "wifi-item-sig" :text "${net.signal} ${net.connected ? '✓' : ''}")))))))
+
+;; Wi-Fi Selector Popup Windows per monitor
+(defwindow wifi_window_0
+  :monitor 0
+  :geometry (geometry :x "460px" :y "5px" :width "300px" :anchor "top right")
+  (wifi_content :close_cmd "eww close wifi_window_0"))
+
+(defwindow wifi_window_1
+  :monitor 1
+  :geometry (geometry :x "460px" :y "5px" :width "300px" :anchor "top right")
+  (wifi_content :close_cmd "eww close wifi_window_1"))
