@@ -83,9 +83,15 @@ tooltip {
     color: #B6FF2E;
   }
 
+  &.bg-app {
+    opacity: 0.65;
+    color: #8fa1b3;
+  }
+
   &:hover {
     background-color: #4f5666;
     color: #B6FF2E;
+    opacity: 1.0;
   }
 
   &:active {
@@ -127,6 +133,14 @@ tooltip {
       background-color: #3e4451;
     }
   }
+
+  &.power {
+    color: #ff6c6b;
+    &:hover {
+      background-color: #3e4451;
+      color: #ff8080;
+    }
+  }
 }
 
 .clock {
@@ -135,30 +149,58 @@ tooltip {
   }
 }
 
-.cal-box {
+/* Common Popup Box Styling (Matches Wi-Fi Box) */
+.cal-box, .power-box, .vol-box, .wifi-box {
   background-color: #1F2329;
   border: none;
-  border-radius: 0px;
+  border-radius: 8px;
   padding: 10px;
   color: #B6FF2E;
+}
+
+/* Calendar Widget Specific Styling */
+calendar {
+  color: #B6FF2E;
+  background-color: #1F2329;
+  
+  &:selected {
+    background-color: #3e4451;
+    color: #B6FF2E;
+  }
+}
+
+/* Power Menu Window Popup Styling */
+.power-btn {
+  background-color: #292E36;
+  padding: 6px 10px;
+  border-radius: 4px;
+  color: #B6FF2E;
+
+  &:hover {
+    background-color: #3e4451;
+  }
+
+  &.shutdown {
+    color: #ff6c6b;
+    &:hover {
+      background-color: #4f2626;
+      color: #ff8080;
+    }
+  }
+}
+
+.power-icon {
+  font-size: 14px;
 }
 
 /* Volume Window Popup Styling */
-.vol-box {
-  background-color: #1F2329;
-  border: none;
-  border-radius: 0px;
-  padding: 10px;
-  color: #B6FF2E;
-}
-
-.vol-title {
+.vol-title, .wifi-title {
   font-size: 14px;
   font-weight: bold;
   color: #B6FF2E;
 }
 
-.vol-close {
+.vol-close, .wifi-close {
   color: #B6FF2E;
   font-weight: bold;
   padding: 0 4px;
@@ -172,7 +214,7 @@ tooltip {
   color: #B6FF2E;
   font-size: 16px;
   padding: 6px 10px;
-  border-radius: 0px;
+  border-radius: 4px;
 
   &.muted {
     color: #ff6c6b;
@@ -189,18 +231,18 @@ tooltip {
 
   trough {
     background-color: #292E36;
-    border-radius: 0px;
+    border-radius: 4px;
     min-height: 8px;
   }
 
   highlight {
     background-color: #B6FF2E;
-    border-radius: 0px;
+    border-radius: 4px;
   }
 
   slider {
     background-color: #B6FF2E;
-    border-radius: 0px;
+    border-radius: 50%;
     min-width: 14px;
     min-height: 14px;
   }
@@ -250,30 +292,7 @@ tooltip {
   }
 }
 
-/* Wi-Fi Window Popup Styling */
-.wifi-box {
-  background-color: #1F2329;
-  border: none;
-  border-radius: 8px;
-  padding: 10px;
-  color: #B6FF2E;
-}
-
-.wifi-title {
-  font-size: 14px;
-  font-weight: bold;
-  color: #B6FF2E;
-}
-
-.wifi-close {
-  color: #B6FF2E;
-  font-weight: bold;
-  padding: 0 4px;
-  &:hover {
-    color: #ff6c6b;
-  }
-}
-
+/* Wi-Fi Window Popup Specific Item Styling */
 .wifi-item {
   background-color: #292E36;
   padding: 6px 10px;

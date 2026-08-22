@@ -1,6 +1,6 @@
 ;; Listeners per monitor output
-(deflisten ws_data_0 :initial "{\"active\": 1, \"workspaces\": []}" "~/.config/eww/scripts/get-workspaces.py 0")
-(deflisten ws_data_1 :initial "{\"active\": 1, \"workspaces\": []}" "~/.config/eww/scripts/get-workspaces.py 1")
+(deflisten ws_data_0 :initial "{\"active\": 1, \"workspaces\": [], \"active_windows\": [], \"background_windows\": []}" "~/.config/eww/scripts/get-workspaces.py 0")
+(deflisten ws_data_1 :initial "{\"active\": 1, \"workspaces\": [], \"active_windows\": [], \"background_windows\": []}" "~/.config/eww/scripts/get-workspaces.py 1")
 
 ;; Daily Verse Poller
 (defpoll daily_verse :interval "12h" "~/.config/eww/scripts/get-verse.py")
@@ -34,7 +34,7 @@
                   :tooltip "Add workspace"
                   "+"))))
     (revealer :transition "slideleft"
-              :reveal {arraylength(ws_source.active_windows) > 0}
+              :reveal {arraylength(ws_source.active_windows) > 0 || arraylength(ws_source.background_windows) > 0}
               :duration "250ms"
       (box :class "win-container" :orientation "h" :space-evenly false :spacing 4
         (for win in {ws_source.active_windows}
@@ -42,6 +42,12 @@
             (button :class {win.is_master ? "win-icon-btn active" : "win-icon-btn"}
                     :onclick "~/.config/eww/scripts/focus-window.py ${win.address} &"
                     :tooltip "${win.title}"
+                    "${win.icon}")))
+        (for win in {ws_source.background_windows}
+          (eventbox :cursor "pointer"
+            (button :class "win-icon-btn bg-app"
+                    :onclick "~/.config/eww/scripts/focus-window.py ${win.address} &"
+                    :tooltip "[Background] ${win.title}"
                     "${win.icon}")))))))
 
 ;; Focus: Static Truncated Verse with Styled Tooltip
@@ -73,6 +79,8 @@
       (button :class "stat updates" :onclick "~/.config/eww/scripts/update-sys.sh &"
               "󰮪 ${(strlength(update_count) == 1 ? '  ' : (strlength(update_count) == 2 ? ' ' : '')) + update_count}"))
     (eventbox :cursor "pointer"
+      (button :class "stat power" :onclick "~/.config/eww/scripts/toggle-power.py &" :tooltip "Power Options" "󰐥"))
+    (eventbox :cursor "pointer"
       (button :class "stat clock" :onclick "~/.config/eww/scripts/toggle-calendar.py &" "${time_str}"))))
 
 ;; Main Bar Layout (Accepts workspace data per monitor)
@@ -81,7 +89,6 @@
     (workspaces_accordion :ws_source ws_data :mon_id mon_id)
     (box :hexpand true (focus_marquee))
     (right_metrics :mon_id mon_id)))
-
 
 ;; Monitor 0 Bar Window
 (defwindow bar_0
@@ -111,6 +118,30 @@
   :geometry (geometry :x "5px" :y "5px" :anchor "top right")
   (box :class "cal-box"
     (calendar :show-details true :show-heading true :day time_day :month time_month :year time_year)))
+
+;; Power Popup Content Widget
+(defwidget power_content [close_cmd]
+  (box :class "power-box" :orientation "v" :space-evenly false :spacing 6
+    (button :class "power-btn reboot" :onclick "reboot"
+      (box :orientation "h" :space-evenly false :spacing 8
+        (label :class "power-icon" :text "󰜉")
+        (label :text "Reboot")))
+    (button :class "power-btn shutdown" :onclick "shutdown now"
+      (box :orientation "h" :space-evenly false :spacing 8
+        (label :class "power-icon" :text "󰐥")
+        (label :text "Shutdown")))))
+
+
+;; Power Selector Popup Windows per monitor
+(defwindow power_window_0
+  :monitor 0
+  :geometry (geometry :x "150px" :y "5px" :width "180px" :anchor "top right")
+  (power_content :close_cmd "eww close power_window_0"))
+
+(defwindow power_window_1
+  :monitor 1
+  :geometry (geometry :x "150px" :y "5px" :width "180px" :anchor "top right")
+  (power_content :close_cmd "eww close power_window_1"))
 
 ;; Instant Volume Popup Content Widget
 (defwidget volume_content [close_cmd]
@@ -144,13 +175,14 @@
 ;; Volume Selector Popup Windows per monitor
 (defwindow volume_window_0
   :monitor 0
-  :geometry (geometry :x "150px" :y "0px" :width "620px" :anchor "top right")
+  :geometry (geometry :x "300px" :y "5px" :width "620px" :anchor "top right")
   (volume_content :close_cmd "eww close volume_window_0"))
 
 (defwindow volume_window_1
   :monitor 1
-  :geometry (geometry :x "150px" :y "0px" :width "620px" :anchor "top right")
+  :geometry (geometry :x "300px" :y "5px" :width "620px" :anchor "top right")
   (volume_content :close_cmd "eww close volume_window_1"))
+
 
 ;; Wi-Fi Popup Content Widget
 (defwidget wifi_content [close_cmd]
