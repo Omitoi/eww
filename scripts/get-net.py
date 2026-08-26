@@ -8,8 +8,10 @@ try:
     print(json.dumps({
         "connected": state == "connected",
         "ssid": ssid or "Disconnected",
-        "icon": "󰤨" if state == "connected" else "󰤭",
+        "icon": "󰖩" if state == "connected" else "󱛅",
         "label": ssid or "Disconnected"
     }))
+
+
 except Exception:
-    print(json.dumps({"connected": False, "ssid": "Error", "icon": "󰤭", "label": "Disconnected"}))
+    print(json.dumps({"connected": False, "ssid": "Error", "icon": "󰖪", "label": "Disconnected"}))

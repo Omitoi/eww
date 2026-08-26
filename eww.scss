@@ -150,7 +150,7 @@ tooltip {
 }
 
 /* Common Popup Box Styling (Matches Wi-Fi Box) */
-.cal-box, .power-box, .vol-box, .wifi-box {
+.cal-box, .power-box, .vol-box, .wifi-box, .bt-box {
   background-color: #1F2329;
   border: none;
   border-radius: 8px;
@@ -194,13 +194,13 @@ calendar {
 }
 
 /* Volume Window Popup Styling */
-.vol-title, .wifi-title {
+.vol-title, .wifi-title, .bt-title {
   font-size: 14px;
   font-weight: bold;
   color: #B6FF2E;
 }
 
-.vol-close, .wifi-close {
+.vol-close, .wifi-close, .bt-close {
   color: #B6FF2E;
   font-weight: bold;
   padding: 0 4px;
@@ -208,6 +208,7 @@ calendar {
     color: #ff6c6b;
   }
 }
+
 
 .vol-mute-btn {
   background-color: #292E36;
@@ -314,6 +315,32 @@ calendar {
 }
 
 .wifi-item-sig {
+  color: #B6FF2E;
+  font-size: 11px;
+}
+
+/* Bluetooth Window Popup Specific Item Styling */
+.bt-item {
+  background-color: #292E36;
+  padding: 6px 10px;
+  border-radius: 4px;
+  color: #B6FF2E;
+
+  &.connected {
+    background-color: #333943;
+    border: none;
+  }
+
+  &:hover {
+    background-color: #3e4451;
+  }
+}
+
+.bt-item-name {
+  color: #B6FF2E;
+}
+
+.bt-item-status {
   color: #B6FF2E;
   font-size: 11px;
 }

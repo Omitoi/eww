@@ -7,17 +7,18 @@ with a 3-tier fuzzy resolution fallback engine.
 
 ICON_MAP = {
     # --- Terminals & CLI Shells ---
-    "kitty": "󰆍", "foot": "󰆍", "alacritty": "󰆍", "wezterm": "󰆍", "ghostty": "󰆍", 
+    "kitty": "󰿠", "foot": "󰆍", "alacritty": "󰆍", "wezterm": "󰆍", "ghostty": "󰆍", 
     "gnome-terminal": "󰆍", "konsole": "󰆍", "xterm": "󰆍", "st": "󰆍", "urxvt": "󰆍", 
     "term": "󰆍", "tilix": "󰆍", "lxterminal": "󰆍", "xfce4-terminal": "󰆍", "tabby": "󰆍",
     "hyper": "󰆍", "rio": "󰆍", "tilda": "󰆍", "guake": "󰆍", "yakuake": "󰆍",
 
     # --- Web Browsers ---
+    "brave": "", "brave-browser": "", "brave-desktop": "", "google-chrome": "󰊯", "chrome": "󰊯",
     "firefox": "󰈹", "firefox-developer-edition": "󰈹", "firefox-nightly": "󰈹",
-    "chromium": "󰈹", "brave": "󰈹", "brave-browser": "󰈹", "google-chrome": "󰈹", "chrome": "󰈹",
-    "zen": "󰈹", "zen-browser": "󰈹", "librewolf": "󰈹", "vivaldi": "󰈹", "opera": "󰈹", 
+    "chromium": "󰈹", "zen": "󰈹", "zen-browser": "󰈹", "librewolf": "󰈹", "vivaldi": "󰈹", "opera": "󰈹", 
     "tor-browser": "󰈹", "epiphany": "󰈹", "qutebrowser": "󰈹", "midori": "󰈹", "falkon": "󰈹", 
     "floorp": "󰈹", "waterfox": "󰈹", "pale-moon": "󰈹", "browser": "󰈹",
+
 
     # --- Code Editors, IDEs & Development ---
     "code": "󰨞", "code-oss": "󰨞", "vscode": "󰨞", "vscodium": "󰨞", "cursor": "󰨞",
@@ -42,7 +43,7 @@ ICON_MAP = {
 
     # --- Communication, Chat & Social ---
     "discord": "󰙯", "vesktop": "󰙯", "webcord": "󰙯", "equibop": "󰙯", "armcord": "󰙯",
-    "telegram": "󰈎", "telegram-desktop": "󰈎", "signal": "󰈎", "element": "󰈎", 
+    "telegram": "", "telegram-desktop": "", "signal": "󰈎", "element": "󰈎", 
     "slack": "󰒱", "whatsapp": "󰈎", "whatsapp-for-linux": "󰈎", "teams": "󰈎", 
     "skype": "󰈎", "zoom": "󰈎", "thunderbird": "󰇮", "geary": "󰇮", "evolution": "󰇮",
 

@@ -4,6 +4,12 @@ import sys, json, subprocess
 if len(sys.argv) > 1:
     target_addr = sys.argv[1]
     
+    if target_addr.startswith("launch:"):
+        cmd = target_addr.split("launch:")[1]
+        subprocess.Popen([cmd])
+        sys.exit(0)
+
+    
     try:
         clients = json.loads(subprocess.check_output(["hyprctl", "clients", "-j"], text=True))
         monitors = json.loads(subprocess.check_output(["hyprctl", "monitors", "-j"], text=True))
