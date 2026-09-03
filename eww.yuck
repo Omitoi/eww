@@ -7,17 +7,26 @@
 
 ;; System Metrics, Network & Bluetooth Pollers
 (defpoll net_info :interval "2s" :initial "{\"connected\": false, \"ssid\": \"\", \"icon\": \"󰤮\", \"label\": \"Disconnected\"}" "~/.config/eww/scripts/get-net.py")
+
 (defpoll wifi_list :interval "5s" :initial "[]" "~/.config/eww/scripts/get-wifi-list.py")
 (defpoll bt_info :interval "3s" :initial "{\"connected\": false, \"powered\": false, \"label\": \"Disabled\", \"icon\": \"󰂲\", \"devices\": []}" "~/.config/eww/scripts/get-bt.py")
 (defpoll bt_list :interval "5s" :initial "[]" "~/.config/eww/scripts/get-bt-list.py")
 (defpoll volume :interval "1s" "wpctl get-volume @DEFAULT_AUDIO_SINK@ | awk '{if ($3 == \"[MUTED]\") print \"MUTED\"; else print int($2*100)}'")
+(defpoll brightness :interval "1s" :initial "󰃠 100%" "~/.config/eww/scripts/get-brightness.py")
 (defpoll time_str :interval "1s" "date '+%H:%M %d/%m/%Y'")
 (defpoll time_day :interval "1h" "date '+%d'")
 (defpoll time_month :interval "1h" "date '+%m'")
 (defpoll time_year :interval "1h" "date '+%Y'")
 (defpoll update_count :interval "30m" "~/.config/eww/scripts/updates.sh")
-(defpoll vol_steps :interval "1s" :initial "[]" "~/.config/eww/scripts/get-vol-steps.py $(wpctl get-volume @DEFAULT_AUDIO_SINK@ | awk '{if ($3 == \"[MUTED]\") print \"MUTED\"; else print int($2*100)}')")
 (defpoll audio_sinks :interval "3s" :initial "[]" "~/.config/eww/scripts/get-audio-sinks.py")
+
+;; OSD State Variables
+(defvar osd_icon "󰃠")
+(defvar osd_value 100)
+(defvar osd_label "100%")
+
+
+
 
 
 ;; Reusable Workspaces Accordion Widget (Native GTK DND Bar)
@@ -61,17 +70,20 @@
 ;; Focus: Static Truncated Verse with Styled Tooltip
 (defwidget focus_marquee []
   (box :class "marquee-wrapper" :halign "center" :valign "center"
-    (label :class "marquee-text"
-           :limit-width 55
-           :show-truncated true
-           :text "${daily_verse}"
-           :tooltip "${daily_verse}")))
+    (eventbox :cursor "pointer"
+      (button :onclick "~/.config/eww/scripts/toggle-verse.py &"
+        (label :class "marquee-text"
+               :limit-width 62
+               :show-truncated true
+               :wrap false
+               :text "${daily_verse}"
+               :tooltip "${daily_verse}")))))
 
 ;; Right Metrics Module
 (defwidget right_metrics [mon_id]
   (box :class "modules-right" :orientation "h" :space-evenly false :spacing 8
-    (label :class "stat net" :text "  ${round(EWW_NET.wlan0.NET_DOWN / 1024, 0)}K   ${round(EWW_NET.wlan0.NET_UP / 1024, 0)}K")
     (eventbox :cursor "pointer"
+
       (button :class {net_info.connected ? "stat net-btn connected" : "stat net-btn disconnected"}
               :onclick "eww open --toggle wifi_window_${mon_id} &"
               :tooltip "Connected: ${net_info.ssid}"
@@ -88,14 +100,17 @@
       (button :class {volume == "MUTED" ? "stat vol muted" : "stat vol"}
               :onclick "eww open --toggle volume_window_${mon_id} &"
               "${volume == 'MUTED' ? '󰝟 Muted' : '󰕾 ' + (strlength(volume) == 1 ? '  ' : (strlength(volume) == 2 ? ' ' : '')) + volume + '%'}"))
-    (label :class "stat bat" :text "󰁹 ${EWW_BATTERY.BAT1.capacity < 10 ? '  ' : (EWW_BATTERY.BAT1.capacity < 100 ? ' ' : '')}${EWW_BATTERY.BAT1.capacity}%")
+    (label :class "stat bri" :text "${brightness}")
+    (label :class "stat bat" :text "${EWW_BATTERY.BAT1.status == 'Charging' || EWW_BATTERY.BAT1.status == 'Full' ? '󰂄' : '󰁹'} ${EWW_BATTERY.BAT1.capacity < 10 ? '  ' : (EWW_BATTERY.BAT1.capacity < 100 ? ' ' : '')}${EWW_BATTERY.BAT1.capacity}%")
+
     (eventbox :cursor "pointer"
       (button :class "stat updates" :onclick "~/.config/eww/scripts/update-sys.sh &"
               "󰮪 ${(strlength(update_count) == 1 ? '  ' : (strlength(update_count) == 2 ? ' ' : '')) + update_count}"))
     (eventbox :cursor "pointer"
-      (button :class "stat power" :onclick "~/.config/eww/scripts/toggle-power.py &" :tooltip "Power Options" "󰐥"))
+      (button :class "stat power" :onclick "eww open --toggle power_window_${mon_id} &" :tooltip "Power Options" "󰐥"))
     (eventbox :cursor "pointer"
-      (button :class "stat clock" :onclick "~/.config/eww/scripts/toggle-calendar.py &" "${time_str}"))))
+      (button :class "stat clock" :onclick "eww open --toggle calendar_window_${mon_id} &" "${time_str}"))))
+
 
 ;; Main Bar Layout (Accepts workspace data per monitor)
 (defwidget bar_layout [ws_data mon_id]
@@ -174,6 +189,8 @@
              :max 101
              :value {volume == "MUTED" ? 0 : volume}
              :onchange "wpctl set-volume @DEFAULT_AUDIO_SINK@ {}% &"))
+
+
     (label :class "vol-device-header" :text "Audio Outputs" :halign "start")
     (box :orientation "v" :spacing 6
       (for sink in audio_sinks
@@ -203,6 +220,7 @@
   (box :class "wifi-box" :orientation "v" :space-evenly false :spacing 8
     (box :class "wifi-header" :orientation "h" :space-evenly false
       (label :class "wifi-title" :text "Available Wi-Fi Networks" :hexpand true)
+      (button :class "wifi-rescan" :onclick "~/.config/eww/scripts/scan-wifi.sh &" :tooltip "Re-scan Wi-Fi Networks" "󰑐")
       (button :class "wifi-close" :onclick close_cmd "󰅖"))
     (box :orientation "v" :spacing 6
       (for net in wifi_list
@@ -228,14 +246,22 @@
   (box :class "bt-box" :orientation "v" :space-evenly false :spacing 8
     (box :class "bt-header" :orientation "h" :space-evenly false
       (label :class "bt-title" :text "Bluetooth Devices" :hexpand true)
+      (button :class "bt-rescan" :onclick "~/.config/eww/scripts/scan-bt.sh &" :tooltip "Re-scan Bluetooth Devices" "󰑐")
       (button :class "bt-close" :onclick close_cmd "󰅖"))
-    (box :orientation "v" :spacing 6
-      (for dev in bt_list
-        (button :class {dev.connected ? "bt-item connected" : "bt-item"}
-                :onclick "~/.config/eww/scripts/connect-bt.sh '${dev.mac}' &"
-          (box :orientation "h" :space-evenly false
-            (label :class "bt-item-name" :text "${dev.name}" :hexpand true :halign "start")
-            (label :class "bt-item-status" :text "${dev.connected ? 'Connected ✓' : 'Disconnected'}" :halign "end")))))))
+    (revealer :transition "slidedown" :reveal {bt_list.empty == true} :duration "200ms"
+      (box :orientation "v" :space-evenly false :spacing 4 :padding 10
+        (label :class "bt-item-status" :text "No devices found" :halign "center")
+        (label :class "bt-item-status" :text "scanning..." :halign "center")))
+    (revealer :transition "slidedown" :reveal {bt_list.empty != true} :duration "200ms"
+      (box :orientation "v" :spacing 6
+        (for dev in {bt_list.devices}
+          (button :class {dev.connected ? "bt-item connected" : "bt-item"}
+                  :onclick "~/.config/eww/scripts/connect-bt.sh '${dev.mac}' &"
+            (box :orientation "h" :space-evenly false
+              (label :class "bt-item-name" :text "${dev.name}" :hexpand true :halign "start")
+              (label :class "bt-item-status" :text "${dev.connected ? 'Connected ✓' : 'Disconnected'}" :halign "end"))))))))
+
+
 
 ;; Bluetooth Selector Popup Windows per monitor
 (defwindow bt_window_0
@@ -247,3 +273,48 @@
   :monitor 1
   :geometry (geometry :x "400px" :y "5px" :width "300px" :anchor "top right")
   (bt_content :close_cmd "eww close bt_window_1"))
+
+;; Bible Verse Popup Content Widget
+(defwidget verse_content [close_cmd]
+  (box :class "verse-box" :orientation "v" :space-evenly false :spacing 10
+    (box :class "verse-header" :orientation "h" :space-evenly false
+      (label :class "verse-title" :text "Verse of the Day" :hexpand true :halign "start")
+      (button :class "verse-close" :onclick close_cmd "󰅖"))
+    (label :class "verse-text-full"
+           :wrap true
+           :xalign 0
+           :show-truncated false
+           :text "${daily_verse}")))
+
+;; Bible Verse Popup Windows per monitor (Centered top)
+(defwindow verse_window_0
+  :monitor 0
+  :geometry (geometry :x "0%" :y "5px" :width "640px" :anchor "top center")
+  (verse_content :close_cmd "eww close verse_window_0"))
+
+(defwindow verse_window_1
+  :monitor 1
+  :geometry (geometry :x "0%" :y "5px" :width "640px" :anchor "top center")
+  (verse_content :close_cmd "eww close verse_window_1"))
+
+;; Transient On-Screen Display (OSD) Overlay Widget
+(defwidget osd_content []
+  (box :class "osd-box" :orientation "h" :space-evenly false :spacing 12
+    (label :class "osd-icon" :text "${osd_icon}")
+    (scale :class "osd-scale" :hexpand true :min 0 :max 101 :value "${osd_value}" :active false)
+    (label :class "osd-label" :text "${osd_label}")))
+
+;; OSD Windows per monitor (Bottom Center)
+(defwindow osd_window_0
+  :monitor 0
+  :geometry (geometry :x "0%" :y "80px" :width "300px" :anchor "bottom center")
+  :stacking "overlay"
+  :exclusive false
+  (osd_content))
+
+(defwindow osd_window_1
+  :monitor 1
+  :geometry (geometry :x "0%" :y "80px" :width "300px" :anchor "bottom center")
+  :stacking "overlay"
+  :exclusive false
+  (osd_content))

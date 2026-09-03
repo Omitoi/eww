@@ -26,6 +26,8 @@ tooltip {
   padding: 2px 5px;
 }
 
+
+
 /* Outer Workspace Container */
 .outer-ws-container {
   background-color: #292E36;
@@ -105,6 +107,8 @@ tooltip {
   padding: 0 10px;
 }
 
+
+
 .marquee-text {
   color: #B6FF2E;
   font-style: italic;
@@ -150,7 +154,7 @@ tooltip {
 }
 
 /* Common Popup Box Styling (Matches Wi-Fi Box) */
-.cal-box, .power-box, .vol-box, .wifi-box, .bt-box {
+.cal-box, .power-box, .vol-box, .wifi-box, .bt-box, .verse-box {
   background-color: #1F2329;
   border: none;
   border-radius: 8px;
@@ -194,13 +198,13 @@ calendar {
 }
 
 /* Volume Window Popup Styling */
-.vol-title, .wifi-title, .bt-title {
+.vol-title, .wifi-title, .bt-title, .verse-title {
   font-size: 14px;
   font-weight: bold;
   color: #B6FF2E;
 }
 
-.vol-close, .wifi-close, .bt-close {
+.vol-close, .wifi-close, .bt-close, .verse-close {
   color: #B6FF2E;
   font-weight: bold;
   padding: 0 4px;
@@ -208,6 +212,26 @@ calendar {
     color: #ff6c6b;
   }
 }
+
+.wifi-rescan, .bt-rescan {
+  color: #B6FF2E;
+  font-weight: bold;
+  padding: 0 6px;
+  &:hover {
+    color: #61afef;
+  }
+}
+
+
+.verse-text-full {
+  color: #B6FF2E;
+  font-style: italic;
+  font-size: 13px;
+  padding: 4px 6px;
+}
+
+
+
 
 
 .vol-mute-btn {
@@ -229,25 +253,29 @@ calendar {
 .vol-scale-slider {
   margin-top: 6px;
   margin-bottom: 6px;
+  margin-right: 8px;
 
   trough {
     background-color: #292E36;
     border-radius: 4px;
     min-height: 8px;
-  }
 
-  highlight {
-    background-color: #B6FF2E;
-    border-radius: 4px;
-  }
+    highlight {
+      background-color: #B6FF2E;
+      border-radius: 4px;
+    }
 
-  slider {
-    background-color: #B6FF2E;
-    border-radius: 50%;
-    min-width: 14px;
-    min-height: 14px;
+    slider {
+      background-color: #B6FF2E;
+      border-radius: 50%;
+      min-width: 14px;
+      min-height: 14px;
+    }
   }
 }
+
+
+
 
 .vol-device-header {
   font-size: 12px;
@@ -343,4 +371,37 @@ calendar {
 .bt-item-status {
   color: #B6FF2E;
   font-size: 11px;
+}
+
+/* On-Screen Display (OSD) Overlay Styling */
+.osd-box {
+  background-color: #1F2329;
+  border-radius: 8px;
+  padding: 8px 16px;
+  color: #B6FF2E;
+}
+
+.osd-icon {
+  font-size: 18px;
+  color: #B6FF2E;
+}
+
+.osd-label {
+  font-size: 13px;
+  font-weight: bold;
+  color: #B6FF2E;
+  min-width: 42px;
+}
+
+.osd-scale {
+  trough {
+    background-color: #292E36;
+    border-radius: 4px;
+    min-height: 8px;
+
+    highlight {
+      background-color: #B6FF2E;
+      border-radius: 4px;
+    }
+  }
 }

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import subprocess
 import json
+import time
 
 def get_bt_list():
     try:
@@ -8,19 +9,32 @@ def get_bt_list():
         conn_out = subprocess.check_output(["bluetoothctl", "devices", "Connected"], text=True)
         conn_macs = set(line.split()[1] for line in conn_out.splitlines() if len(line.split()) > 1)
         
-        devs = []
-        for line in out.splitlines():
-            parts = line.strip().split(" ", 2)
-            if len(parts) >= 3:
-                mac, name = parts[1], parts[2]
-                devs.append({
-                    "mac": mac,
-                    "name": name,
-                    "connected": mac in conn_macs
-                })
-        print(json.dumps(devs))
+        devs = [
+            {"mac": parts[1], "name": parts[2], "connected": parts[1] in conn_macs}
+            for line in out.splitlines()
+            if len(parts := line.strip().split(" ", 2)) >= 3
+        ]
+
+        if not devs:
+            # Trigger active scan in background if no devices found
+            subprocess.Popen(["bluetoothctl", "--timeout", "5", "scan", "on"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            return json.dumps({
+                "empty": True,
+                "devices": [],
+                "message": "No devices found\nscanning..."
+            })
+
+        return json.dumps({
+            "empty": False,
+            "devices": devs,
+            "message": ""
+        })
     except Exception:
-        print(json.dumps([]))
+        return json.dumps({
+            "empty": True,
+            "devices": [],
+            "message": "No devices found\nscanning..."
+        })
 
 if __name__ == "__main__":
-    get_bt_list()
+    print(get_bt_list())
