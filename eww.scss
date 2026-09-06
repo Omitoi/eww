@@ -102,18 +102,20 @@ tooltip {
   }
 }
 
-/* Marquee Verse Label */
-.marquee-wrapper {
-  padding: 0 10px;
+/* Wallpaper Verse Splash Styling */
+.verse-splash-box {
+  background-color: transparent;
+  padding: 0;
 }
 
-
-
-.marquee-text {
+.verse-splash-text {
   color: #B6FF2E;
   font-style: italic;
+  font-size: 14px;
   font-weight: normal;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
 }
+
 
 /* Metrics & Clock */
 .stat {
@@ -154,7 +156,7 @@ tooltip {
 }
 
 /* Common Popup Box Styling (Matches Wi-Fi Box) */
-.cal-box, .power-box, .vol-box, .wifi-box, .bt-box, .verse-box {
+.cal-box, .power-box, .vol-box, .wifi-box, .bt-box {
   background-color: #1F2329;
   border: none;
   border-radius: 8px;
@@ -198,13 +200,13 @@ calendar {
 }
 
 /* Volume Window Popup Styling */
-.vol-title, .wifi-title, .bt-title, .verse-title {
+.vol-title, .wifi-title, .bt-title {
   font-size: 14px;
   font-weight: bold;
   color: #B6FF2E;
 }
 
-.vol-close, .wifi-close, .bt-close, .verse-close {
+.vol-close, .wifi-close, .bt-close {
   color: #B6FF2E;
   font-weight: bold;
   padding: 0 4px;
@@ -222,13 +224,6 @@ calendar {
   }
 }
 
-
-.verse-text-full {
-  color: #B6FF2E;
-  font-style: italic;
-  font-size: 13px;
-  padding: 4px 6px;
-}
 
 
 
@@ -322,6 +317,20 @@ calendar {
 }
 
 /* Wi-Fi Window Popup Specific Item Styling */
+.wifi-disconnect-btn {
+  background-color: #292E36;
+  padding: 6px 10px;
+  border-radius: 4px;
+  color: #ff6c6b;
+  font-weight: bold;
+  margin-bottom: 4px;
+
+  &:hover {
+    background-color: #4f2626;
+    color: #ff8080;
+  }
+}
+
 .wifi-item {
   background-color: #292E36;
   padding: 6px 10px;
@@ -346,6 +355,7 @@ calendar {
   color: #B6FF2E;
   font-size: 11px;
 }
+
 
 /* Bluetooth Window Popup Specific Item Styling */
 .bt-item {

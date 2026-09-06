@@ -67,17 +67,6 @@
                     "${win.icon}")))))
 ))
 
-;; Focus: Static Truncated Verse with Styled Tooltip
-(defwidget focus_marquee []
-  (box :class "marquee-wrapper" :halign "center" :valign "center"
-    (eventbox :cursor "pointer"
-      (button :onclick "~/.config/eww/scripts/toggle-verse.py &"
-        (label :class "marquee-text"
-               :limit-width 62
-               :show-truncated true
-               :wrap false
-               :text "${daily_verse}"
-               :tooltip "${daily_verse}")))))
 
 ;; Right Metrics Module
 (defwidget right_metrics [mon_id]
@@ -116,8 +105,9 @@
 (defwidget bar_layout [ws_data mon_id]
   (box :class "bar-box" :orientation "h" :space-evenly false
     (workspaces_accordion :ws_source ws_data :mon_id mon_id)
-    (box :hexpand true (focus_marquee))
+    (box :hexpand true)
     (right_metrics :mon_id mon_id)))
+
 
 ;; Monitor 0 Bar Window
 (defwindow bar_0
@@ -222,6 +212,12 @@
       (label :class "wifi-title" :text "Available Wi-Fi Networks" :hexpand true)
       (button :class "wifi-rescan" :onclick "~/.config/eww/scripts/scan-wifi.sh &" :tooltip "Re-scan Wi-Fi Networks" "󰑐")
       (button :class "wifi-close" :onclick close_cmd "󰅖"))
+    (revealer :transition "slidedown" :reveal {net_info.connected} :duration "200ms"
+      (button :class "wifi-disconnect-btn"
+              :onclick "~/.config/eww/scripts/disconnect-wifi.sh &"
+        (box :orientation "h" :space-evenly false :spacing 6 :halign "center"
+          (label :text "󰤭")
+          (label :text "Disconnect (${net_info.ssid})"))))
     (box :orientation "v" :spacing 6
       (for net in wifi_list
         (button :class {net.connected ? "wifi-item connected" : "wifi-item"}
@@ -230,15 +226,16 @@
             (label :class "wifi-item-name" :text "${net.name}" :hexpand true :halign "start")
             (label :class "wifi-item-sig" :text "${net.signal} ${net.connected ? '✓' : ''}")))))))
 
+
 ;; Wi-Fi Selector Popup Windows per monitor
 (defwindow wifi_window_0
   :monitor 0
-  :geometry (geometry :x "460px" :y "5px" :width "300px" :anchor "top right")
+  :geometry (geometry :x "620px" :y "5px" :width "300px" :anchor "top right")
   (wifi_content :close_cmd "eww close wifi_window_0"))
 
 (defwindow wifi_window_1
   :monitor 1
-  :geometry (geometry :x "460px" :y "5px" :width "300px" :anchor "top right")
+  :geometry (geometry :x "620px" :y "5px" :width "300px" :anchor "top right")
   (wifi_content :close_cmd "eww close wifi_window_1"))
 
 ;; Bluetooth Popup Content Widget
@@ -266,36 +263,38 @@
 ;; Bluetooth Selector Popup Windows per monitor
 (defwindow bt_window_0
   :monitor 0
-  :geometry (geometry :x "400px" :y "5px" :width "300px" :anchor "top right")
-  (bt_content :close_cmd "eww close bt_window_0"))
+  :geometry (geometry :x "520px" :y "5px" :width "300px" :anchor "top right")
+  (bt_content :close_cmd "eww close bt_window_0"));
 
 (defwindow bt_window_1
   :monitor 1
-  :geometry (geometry :x "400px" :y "5px" :width "300px" :anchor "top right")
+  :geometry (geometry :x "520px" :y "5px" :width "300px" :anchor "top right")
   (bt_content :close_cmd "eww close bt_window_1"))
 
-;; Bible Verse Popup Content Widget
-(defwidget verse_content [close_cmd]
-  (box :class "verse-box" :orientation "v" :space-evenly false :spacing 10
-    (box :class "verse-header" :orientation "h" :space-evenly false
-      (label :class "verse-title" :text "Verse of the Day" :hexpand true :halign "start")
-      (button :class "verse-close" :onclick close_cmd "󰅖"))
-    (label :class "verse-text-full"
+;; Bible Verse Wallpaper Splash Widget
+(defwidget verse_splash_content []
+  (box :class "verse-splash-box" :orientation "v" :space-evenly false :halign "center" :valign "center"
+    (label :class "verse-splash-text"
            :wrap true
-           :xalign 0
-           :show-truncated false
+           :xalign 0.5
+           :justify "center"
            :text "${daily_verse}")))
 
-;; Bible Verse Popup Windows per monitor (Centered top)
-(defwindow verse_window_0
+;; Wallpaper Verse Splash Windows per monitor (Bottom Center, Layer Shell: Background)
+(defwindow verse_splash_0
   :monitor 0
-  :geometry (geometry :x "0%" :y "5px" :width "640px" :anchor "top center")
-  (verse_content :close_cmd "eww close verse_window_0"))
+  :geometry (geometry :x "0%" :y "40px" :width "90%" :anchor "bottom center")
+  :stacking "bg"
+  :exclusive false
+  (verse_splash_content))
 
-(defwindow verse_window_1
+(defwindow verse_splash_1
   :monitor 1
-  :geometry (geometry :x "0%" :y "5px" :width "640px" :anchor "top center")
-  (verse_content :close_cmd "eww close verse_window_1"))
+  :geometry (geometry :x "0%" :y "40px" :width "90%" :anchor "bottom center")
+  :stacking "bg"
+  :exclusive false
+  (verse_splash_content))
+
 
 ;; Transient On-Screen Display (OSD) Overlay Widget
 (defwidget osd_content []
