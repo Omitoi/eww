@@ -20,6 +20,7 @@
 (defpoll time_year :interval "1h" "date '+%Y'")
 (defpoll update_count :interval "30m" "~/.config/eww/scripts/updates.sh")
 (defpoll audio_sinks :interval "3s" :initial "[]" "~/.config/eww/scripts/get-audio-sinks.py")
+(defpoll battery_info :interval "2s" :initial "{\"has_battery\": true, \"capacity\": 0, \"status\": \"Unknown\", \"icon\": \"󰁹\", \"label\": \"󰁹   0%\"}" "~/.config/eww/scripts/get-battery.py")
 
 ;; OSD State Variables
 (defvar osd_icon "󰃠")
@@ -83,7 +84,10 @@
               :onclick "eww open --toggle volume_window_${mon_id} &"
               "${volume == 'MUTED' ? '󰝟 Muted' : '󰕾 ' + (strlength(volume) == 1 ? '  ' : (strlength(volume) == 2 ? ' ' : '')) + volume + '%'}"))
     (label :class "stat bri" :text "${brightness}")
-    (label :class "stat bat" :text "${EWW_BATTERY.BAT1.status == 'Charging' || EWW_BATTERY.BAT1.status == 'Full' ? '󰂄' : '󰁹'} ${EWW_BATTERY.BAT1.capacity < 10 ? '  ' : (EWW_BATTERY.BAT1.capacity < 100 ? ' ' : '')}${EWW_BATTERY.BAT1.capacity}%")
+    (label :class "stat bat"
+           :visible {battery_info.has_battery}
+           :tooltip "${battery_info.status}: ${battery_info.capacity}%"
+           :text "${battery_info.label}")
 
     (eventbox :cursor "pointer"
       (button :class "stat updates" :onclick "~/.config/eww/scripts/update-sys.sh &"
