@@ -102,6 +102,71 @@ tooltip {
   }
 }
 
+/* System Tray Container */
+.tray-container {
+  background-color: #292E36;
+  border-radius: 4px;
+  padding: 2px 2px;
+
+  button {
+    all: unset;
+    padding: 2px 4px;
+    border-radius: 2px;
+
+    &:hover {
+      background-color: #4f5666;
+    }
+  }
+
+  image {
+    -gtk-icon-transform: scale(0.62);
+  }
+}
+
+/* GTK Context Menu Theme (Systray Menus) */
+menu {
+  background-color: #1F2329;
+  border: 1px solid #3e4451;
+  border-radius: 6px;
+  padding: 4px;
+}
+
+menuitem {
+  padding: 6px 14px;
+  border-radius: 4px;
+  color: #E5E9F0;
+  font-size: 12px;
+  font-weight: normal;
+
+  label {
+    color: #E5E9F0;
+    font-weight: normal;
+  }
+
+  &:hover {
+    background-color: #292E36;
+    color: #B6FF2E;
+
+    label {
+      color: #B6FF2E;
+    }
+  }
+
+  &:disabled {
+    color: #5c6370;
+
+    label {
+      color: #5c6370;
+    }
+  }
+}
+
+menu separator {
+  background-color: #292E36;
+  min-height: 1px;
+  margin: 4px 0;
+}
+
 /* Wallpaper Verse Splash Styling */
 .verse-splash-box {
   background-color: transparent;
@@ -145,6 +210,13 @@ tooltip {
     &:hover {
       background-color: #3e4451;
       color: #ff8080;
+    }
+  }
+
+  &.lang {
+    font-weight: bold;
+    &:hover {
+      background-color: #3e4451;
     }
   }
 }
@@ -414,4 +486,19 @@ calendar {
       border-radius: 4px;
     }
   }
+}
+
+.kb-osd-box {
+  padding: 10px 24px;
+}
+
+.kb-icon {
+  font-size: 20px;
+  color: #B6FF2E;
+}
+
+.kb-osd-text {
+  font-size: 15px;
+  font-weight: bold;
+  color: #B6FF2E;
 }

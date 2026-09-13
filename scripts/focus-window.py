@@ -8,7 +8,7 @@ if len(sys.argv) > 1:
 
 
         cmd = target_addr.split("launch:")[1]
-        subprocess.Popen([cmd])
+        subprocess.Popen(cmd.split())
         sys.exit(0)
 
     

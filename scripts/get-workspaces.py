@@ -44,18 +44,6 @@ def print_state(target_mon):
                 "icon": resolve_icon(c.get("class", ""), c.get("title", ""))
             })
 
-    # Track background daemons like Steam running silently without an active window
-    if "steam" not in registered_classes:
-        try:
-            res = subprocess.run(["pgrep", "-x", "steam"], stdout=subprocess.DEVNULL)
-            if res.returncode == 0:
-                bg_wins.append({
-                    "address": "launch:steam",
-                    "title": "Steam (Background)",
-                    "icon": resolve_icon("steam", "Steam")
-                })
-        except Exception: pass
-
     print(json.dumps({
         "active": active_ws, 
         "next_ws": max_ws + 1, 

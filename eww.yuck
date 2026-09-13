@@ -1,6 +1,7 @@
 ;; Listeners per monitor output
 (deflisten ws_data_0 :initial "{\"active\": 1, \"workspaces\": [], \"active_windows\": [], \"background_windows\": []}" "~/.config/eww/scripts/get-workspaces.py 0")
 (deflisten ws_data_1 :initial "{\"active\": 1, \"workspaces\": [], \"active_windows\": [], \"background_windows\": []}" "~/.config/eww/scripts/get-workspaces.py 1")
+(deflisten kb_layout :initial "{\"code\": \"CZ\", \"name\": \"Czech\"}" "~/.config/eww/scripts/get-kb-layout.py")
 
 ;; Daily Verse Poller
 (defpoll daily_verse :interval "12h" "~/.config/eww/scripts/get-verse.py")
@@ -55,16 +56,8 @@
                     :onclick "~/.config/eww/scripts/focus-window.py ${win.address} &"
                     :tooltip "${win.title}"
                     "${win.icon}")))))
-    (revealer :transition "slideleft"
-              :reveal {arraylength(ws_source.background_windows) > 0}
-              :duration "250ms"
-      (box :class "win-container bg-container" :orientation "h" :space-evenly false :spacing 4
-        (for win in {ws_source.background_windows}
-          (eventbox :cursor "pointer"
-            (button :class "win-icon-btn bg-app"
-                    :onclick "~/.config/eww/scripts/focus-window.py ${win.address} &"
-                    :tooltip "[Background] ${win.title}"
-                    "${win.icon}")))))
+    (box :class "tray-container" :orientation "h" :space-evenly false
+      (systray :orientation "h" :spacing 6 :icon-size "menu" :prepend-new true))
 ))
 
 
@@ -97,6 +90,8 @@
               "󰮪 ${(strlength(update_count) == 1 ? '  ' : (strlength(update_count) == 2 ? ' ' : '')) + update_count}"))
     (eventbox :cursor "pointer"
       (button :class "stat power" :onclick "eww open --toggle power_window_${mon_id} &" :tooltip "Power Options" "󰐥"))
+    (eventbox :cursor "pointer"
+      (button :class "stat lang" :onclick "hyprctl switchxkblayout all next &" :tooltip "${kb_layout.name}" "󰌌 ${kb_layout.code}"))
     (eventbox :cursor "pointer"
       (button :class "stat clock" :onclick "eww open --toggle calendar_window_${mon_id} &" "${time_str}"))))
 
@@ -317,3 +312,23 @@
   :stacking "overlay"
   :exclusive false
   (osd_content))
+
+;; Keyboard Layout OSD Popup Widget
+(defwidget kb_osd_content []
+  (box :class "osd-box kb-osd-box" :orientation "h" :space-evenly false :spacing 12 :halign "center"
+    (label :class "osd-icon kb-icon" :text "󰌌")
+    (label :class "kb-osd-text" :text "${kb_layout.name} (${kb_layout.code})")))
+
+(defwindow kb_osd_window_0
+  :monitor 0
+  :geometry (geometry :x "0%" :y "80px" :width "260px" :anchor "bottom center")
+  :stacking "overlay"
+  :exclusive false
+  (kb_osd_content))
+
+(defwindow kb_osd_window_1
+  :monitor 1
+  :geometry (geometry :x "0%" :y "80px" :width "260px" :anchor "bottom center")
+  :stacking "overlay"
+  :exclusive false
+  (kb_osd_content))

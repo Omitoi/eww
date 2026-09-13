@@ -43,8 +43,8 @@ ICON_MAP = {
 
     # --- Communication, Chat & Social ---
     "discord": "󰙯", "vesktop": "󰙯", "webcord": "󰙯", "equibop": "󰙯", "armcord": "󰙯",
-    "telegram": "", "telegram-desktop": "", "signal": "󰈎", "element": "󰈎", 
-    "slack": "󰒱", "whatsapp": "󰈎", "whatsapp-for-linux": "󰈎", "teams": "󰈎", 
+    "telegram": "", "telegram-desktop": "", "telegramdesktop": "", "signal": "󰈎", "element": "󰈎", 
+    "slack": "󰒱", "whatsapp": "󰖣", "whatsapp-for-linux": "󰖣", "whatsie": "󰖣", "teams": "󰈎", 
     "skype": "󰈎", "zoom": "󰈎", "thunderbird": "󰇮", "geary": "󰇮", "evolution": "󰇮",
 
     # --- Gaming, Launchers & Emulators ---
