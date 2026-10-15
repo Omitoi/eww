@@ -15,6 +15,9 @@ def get_battery():
     except Exception:
         return {"has_battery": False, "capacity": 0, "status": "Unknown", "icon": "󰁹", "label": ""}
 
+    if cap <= 0 and status != "Charging":
+        return {"has_battery": False, "capacity": 0, "status": status, "icon": "󰁹", "label": ""}
+
     icon = "󰂄" if status in ["Charging", "Full"] else "󰁹"
     pad = "  " if cap < 10 else (" " if cap < 100 else "")
     return {"has_battery": True, "capacity": cap, "status": status, "icon": icon, "label": f"{icon} {pad}{cap}%"}
