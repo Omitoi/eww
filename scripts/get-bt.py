@@ -1,16 +1,29 @@
 #!/usr/bin/env python3
-import json, subprocess
+import glob
+import json
+import os
+import subprocess
 
 def get_bt_status():
+    if not os.path.exists("/sys/class/bluetooth") or not glob.glob("/sys/class/bluetooth/hci*"):
+        return {
+            "has_bluetooth": False,
+            "connected": False,
+            "powered": False,
+            "label": "",
+            "icon": "",
+            "devices": []
+        }
+
     try:
         powered = False
-        res = subprocess.check_output(["bluetoothctl", "show"], text=True)
+        res = subprocess.check_output(["bluetoothctl", "show"], text=True, timeout=2)
         for line in res.splitlines():
             if "Powered: yes" in line:
                 powered = True
                 break
 
-        conn_out = subprocess.check_output(["bluetoothctl", "devices", "Connected"], text=True)
+        conn_out = subprocess.check_output(["bluetoothctl", "devices", "Connected"], text=True, timeout=2)
         connected_devs = []
         for line in conn_out.splitlines():
             parts = line.strip().split(" ", 2)
@@ -30,15 +43,23 @@ def get_bt_status():
             label = "On"
             connected = True
 
-        print(json.dumps({
+        return {
+            "has_bluetooth": True,
             "connected": connected,
             "powered": powered,
             "label": label,
             "icon": icon,
             "devices": connected_devs
-        }))
+        }
     except Exception:
-        print(json.dumps({"connected": False, "powered": False, "label": "Disabled", "icon": "󰂲", "devices": []}))
+        return {
+            "has_bluetooth": True,
+            "connected": False,
+            "powered": False,
+            "label": "Disabled",
+            "icon": "󰂲",
+            "devices": []
+        }
 
 if __name__ == "__main__":
-    get_bt_status()
+    print(json.dumps(get_bt_status()))
