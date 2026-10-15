@@ -10,7 +10,7 @@
 (defpoll net_info :interval "2s" :initial "{\"connected\": false, \"ssid\": \"\", \"icon\": \"󰤮\", \"label\": \"Disconnected\"}" "~/.config/eww/scripts/get-net.py")
 
 (defpoll wifi_list :interval "5s" :initial "[]" "~/.config/eww/scripts/get-wifi-list.py")
-(defpoll bt_info :interval "3s" :initial "{\"connected\": false, \"powered\": false, \"label\": \"Disabled\", \"icon\": \"󰂲\", \"devices\": []}" "~/.config/eww/scripts/get-bt.py")
+(defpoll bt_info :interval "3s" :initial "{\"has_bluetooth\": false, \"connected\": false, \"powered\": false, \"label\": \"Disabled\", \"icon\": \"󰂲\", \"devices\": []}" "~/.config/eww/scripts/get-bt.py")
 (defpoll bt_list :interval "5s" :initial "[]" "~/.config/eww/scripts/get-bt-list.py")
 (defpoll volume :interval "1s" "wpctl get-volume @DEFAULT_AUDIO_SINK@ | awk '{if ($3 == \"[MUTED]\") print \"MUTED\"; else print int($2*100)}'")
 (defpoll brightness :interval "1s" :initial "󰃠 100%" "~/.config/eww/scripts/get-brightness.py")
@@ -70,6 +70,7 @@
               :tooltip "Connected: ${net_info.ssid}"
               "${net_info.icon} ${net_info.label}"))
     (eventbox :cursor "pointer"
+              :visible {bt_info.has_bluetooth}
       (button :class {bt_info.connected ? "stat net-btn connected" : "stat net-btn disconnected"}
               :onclick "eww open --toggle bt_window_${mon_id} &"
               :tooltip "Bluetooth: ${bt_info.label}"
