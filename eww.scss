@@ -205,6 +205,19 @@ menu separator {
     }
   }
 
+  &.updates {
+    &:hover {
+      background-color: #3e4451;
+    }
+    &.reboot {
+      color: #ff6c6b;
+      &:hover {
+        background-color: #4f2626;
+        color: #ff8080;
+      }
+    }
+  }
+
   &.power {
     color: #ff6c6b;
     &:hover {

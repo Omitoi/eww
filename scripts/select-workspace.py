@@ -7,32 +7,34 @@ if len(sys.argv) < 3:
     sys.exit(1)
 
 target_ws = int(sys.argv[1])
-
-
 click_mon = int(sys.argv[2])
 
 try:
-    monitors = json.loads(subprocess.check_output(["hyprctl", "monitors", "-j"], text=True))
-    workspaces = json.loads(subprocess.check_output(["hyprctl", "workspaces", "-j"], text=True))
+    mons = json.loads(subprocess.check_output(["hyprctl", "monitors", "-j"], text=True))
+    wss = json.loads(subprocess.check_output(["hyprctl", "workspaces", "-j"], text=True))
 
-    target_ws_data = next((w for w in workspaces if w["id"] == target_ws), None)
-    click_mon_data = next((m for m in monitors if m["id"] == click_mon), None)
+    click_mon_data = next((m for m in mons if m["id"] == click_mon), None)
+    if not click_mon_data:
+        sys.exit(0)
 
-    if target_ws_data and click_mon_data:
-        target_current_mon = target_ws_data["monitorID"]
-        click_mon_active_ws = click_mon_data["activeWorkspace"]["id"]
+    click_mon_active_ws = click_mon_data["activeWorkspace"]["id"]
+    if target_ws == click_mon_active_ws:
+        sys.exit(0)
 
-        if target_current_mon == click_mon:
-            # Workspace on clicked monitor -> focus it
-            subprocess.run(["hyprctl", "eval", f"hl.dispatch(hl.dsp.focus({{ workspace = {target_ws} }}))"])
-        else:
-            # Swap workspace monitors
-            subprocess.run(["hyprctl", "eval", f"hl.dispatch(hl.dsp.workspace.move({{ workspace = {target_ws}, monitor = {click_mon} }}))"])
-            subprocess.run(["hyprctl", "eval", f"hl.dispatch(hl.dsp.workspace.move({{ workspace = {click_mon_active_ws}, monitor = {target_current_mon} }}))"])
-            subprocess.run(["hyprctl", "eval", f"hl.dispatch(hl.dsp.focus({{ workspace = {target_ws} }}))"])
+    target_ws_data = next((w for w in wss if w["id"] == target_ws), None)
+    other_mon = next((m for m in mons if m["id"] != click_mon and m["activeWorkspace"]["id"] == target_ws), None)
+
+    if other_mon:
+        # Only swap if target workspace is actively displayed on the other monitor
+        other_mon_id = other_mon["id"]
+        subprocess.run(["hyprctl", "eval", f"hl.dispatch(hl.dsp.workspace.move({{ workspace = {target_ws}, monitor = {click_mon} }}))"])
+        subprocess.run(["hyprctl", "eval", f"hl.dispatch(hl.dsp.workspace.move({{ workspace = {click_mon_active_ws}, monitor = {other_mon_id} }}))"])
+        subprocess.run(["hyprctl", "eval", f"hl.dispatch(hl.dsp.focus({{ workspace = {target_ws} }}))"])
     else:
-        # Create/focus new workspace on target monitor
+        # Otherwise, switch only the clicked monitor; leave other monitor untouched
+        if target_ws_data and target_ws_data["monitorID"] != click_mon:
+            subprocess.run(["hyprctl", "eval", f"hl.dispatch(hl.dsp.workspace.move({{ workspace = {target_ws}, monitor = {click_mon} }}))"])
         subprocess.run(["hyprctl", "eval", f"hl.dispatch(hl.dsp.focus({{ workspace = {target_ws} }}))"])
 
-except Exception as e:
-    subprocess.run(["hyprctl", "eval", f"hl.dispatch(hl.dsp.focus({{ workspace = {target_ws} }}))"])
+except Exception:
+    pass

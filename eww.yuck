@@ -15,10 +15,8 @@
 (defpoll volume :interval "1s" "wpctl get-volume @DEFAULT_AUDIO_SINK@ | awk '{if ($3 == \"[MUTED]\") print \"MUTED\"; else print int($2*100)}'")
 (defpoll brightness :interval "1s" :initial "󰃠 100%" "~/.config/eww/scripts/get-brightness.py")
 (defpoll time_str :interval "1s" "date '+%H:%M %d/%m/%Y'")
-(defpoll time_day :interval "1h" "date '+%d'")
-(defpoll time_month :interval "1h" "date '+%m'")
-(defpoll time_year :interval "1h" "date '+%Y'")
-(defpoll update_count :interval "30m" "~/.config/eww/scripts/updates.sh")
+(defpoll update_count :interval "30m" "checkupdates 2>/dev/null | wc -l")
+(defvar needs_reboot false)
 (defpoll audio_sinks :interval "3s" :initial "[]" "~/.config/eww/scripts/get-audio-sinks.py")
 (defpoll battery_info :interval "2s" :initial "{\"has_battery\": true, \"capacity\": 0, \"status\": \"Unknown\", \"icon\": \"󰁹\", \"label\": \"󰁹   0%\"}" "~/.config/eww/scripts/get-battery.py")
 
@@ -83,15 +81,17 @@
       (button :class {volume == "MUTED" ? "stat vol muted" : "stat vol"}
               :onclick "eww open --toggle volume_window_${mon_id} &"
               "${volume == 'MUTED' ? '󰝟 Muted' : '󰕾 ' + (strlength(volume) == 1 ? '  ' : (strlength(volume) == 2 ? ' ' : '')) + volume + '%'}"))
-    (label :class "stat bri" :text "${brightness}")
+    (label :class "stat bri" :visible {brightness != ""} :text "${brightness}")
     (label :class "stat bat"
            :visible {battery_info.has_battery}
            :tooltip "${battery_info.status}: ${battery_info.capacity}%"
            :text "${battery_info.label}")
 
     (eventbox :cursor "pointer"
-      (button :class "stat updates" :onclick "~/.config/eww/scripts/update-sys.sh &"
-              "󰮪 ${(strlength(update_count) == 1 ? '  ' : (strlength(update_count) == 2 ? ' ' : '')) + update_count}"))
+      (button :class {needs_reboot ? "stat updates reboot" : "stat updates"}
+              :onclick "~/.config/eww/scripts/update-sys.sh &"
+              :tooltip {needs_reboot ? "Reboot required after system update" : "System updates"}
+              "${(needs_reboot ? '󰜉 ' : '󰮪 ') + (strlength(update_count) == 1 ? '  ' : (strlength(update_count) == 2 ? ' ' : '')) + update_count}"))
     (eventbox :cursor "pointer"
       (button :class "stat power" :onclick "eww open --toggle power_window_${mon_id} &" :tooltip "Power Options" "󰐥"))
     (eventbox :cursor "pointer"
@@ -129,13 +129,13 @@
   :monitor 0
   :geometry (geometry :x "5px" :y "5px" :anchor "top right")
   (box :class "cal-box"
-    (calendar :show-details true :show-heading true :day time_day :month time_month :year time_year)))
+    (calendar :show-details true :show-heading true :show-day-names true)))
 
 (defwindow calendar_window_1
   :monitor 1
   :geometry (geometry :x "5px" :y "5px" :anchor "top right")
   (box :class "cal-box"
-    (calendar :show-details true :show-heading true :day time_day :month time_month :year time_year)))
+    (calendar :show-details true :show-heading true :show-day-names true)))
 
 ;; Power Popup Content Widget
 (defwidget power_content [close_cmd]
