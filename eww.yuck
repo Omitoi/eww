@@ -2,6 +2,7 @@
 (deflisten ws_data_0 :initial "{\"active\": 1, \"workspaces\": [], \"active_windows\": [], \"background_windows\": []}" "~/.config/eww/scripts/get-workspaces.py 0")
 (deflisten ws_data_1 :initial "{\"active\": 1, \"workspaces\": [], \"active_windows\": [], \"background_windows\": []}" "~/.config/eww/scripts/get-workspaces.py 1")
 (deflisten kb_layout :initial "{\"code\": \"CZ\", \"name\": \"Czech\"}" "~/.config/eww/scripts/get-kb-layout.py")
+(deflisten mpris_data :initial "{\"status\": \"Stopped\", \"artist\": \"\", \"title\": \"\", \"text\": \"\", \"player\": \"\"}" "~/.config/eww/scripts/get-mpris.py")
 
 ;; Daily Verse Poller
 (defpoll daily_verse :interval "12h" "~/.config/eww/scripts/get-verse.py")
@@ -56,7 +57,7 @@
                     :tooltip "${win.title}"
                     "${win.icon}")))))
     (box :class "tray-container" :orientation "h" :space-evenly false
-      (systray :orientation "h" :spacing 6 :icon-size "menu" :prepend-new true))
+      (systray :orientation "h" :spacing 6 :icon-size 16 :prepend-new true))
 ))
 
 
@@ -101,10 +102,28 @@
       (button :class "stat clock" :onclick "eww open --toggle calendar_window_${mon_id} &" "${time_str}"))))
 
 
+;; Center Now-Playing Widget
+(defwidget mpris_widget []
+  (revealer :transition "crossfade"
+            :reveal {mpris_data.status != "Stopped" && mpris_data.text != ""}
+            :duration "300ms"
+            :valign "center"
+            :halign "center"
+    (eventbox :cursor "pointer"
+              :onclick "playerctl play-pause &"
+              :onscroll "sh -c 'if [ \"{}\" = \"up\" ]; then playerctl next; else playerctl previous; fi' &"
+              :tooltip "${mpris_data.player}: ${mpris_data.text} (Click: Play/Pause, Scroll: Track)"
+      (box :class "mpris-box" :orientation "h" :space-evenly false :spacing 6 :valign "center" :halign "center"
+        (label :class "mpris-icon" :text {mpris_data.status == "Playing" ? "󰎆" : "󰏤"})
+        (label :class "mpris-text" :limit-width 50 :text {mpris_data.text})))))
+
+
 ;; Main Bar Layout (Accepts workspace data per monitor)
 (defwidget bar_layout [ws_data mon_id]
   (box :class "bar-box" :orientation "h" :space-evenly false
     (workspaces_accordion :ws_source ws_data :mon_id mon_id)
+    (box :hexpand true)
+    (mpris_widget)
     (box :hexpand true)
     (right_metrics :mon_id mon_id)))
 

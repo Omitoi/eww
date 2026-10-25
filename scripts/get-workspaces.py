@@ -1,9 +1,24 @@
 #!/usr/bin/env python3
-import json, os, socket, subprocess, sys
+import glob, json, os, socket, subprocess, sys
 from icon_map import resolve_icon
 
 def get_hypr(cmd):
     return json.loads(subprocess.check_output(["hyprctl", cmd, "-j"], text=True))
+
+def find_socket():
+    uid = os.getuid()
+    runtime_dir = os.environ.get("XDG_RUNTIME_DIR", f"/run/user/{uid}")
+    sig = os.environ.get("HYPRLAND_INSTANCE_SIGNATURE", "")
+    if sig:
+        candidate = os.path.join(runtime_dir, "hypr", sig, ".socket2.sock")
+        if os.path.exists(candidate):
+            return candidate
+    socks = glob.glob(f"{runtime_dir}/hypr/*/.socket2.sock")
+    if socks:
+        detected_sig = socks[0].split(os.sep)[-2]
+        os.environ["HYPRLAND_INSTANCE_SIGNATURE"] = detected_sig
+        return socks[0]
+    return None
 
 def print_state(target_mon):
     monitors, workspaces, clients = get_hypr("monitors"), get_hypr("workspaces"), get_hypr("clients")
@@ -55,9 +70,10 @@ def print_state(target_mon):
 
 if __name__ == "__main__":
     target_mon = int(sys.argv[1]) if len(sys.argv) > 1 else 0
+    sock_path = find_socket()
     print_state(target_mon)
     sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-    sock.connect(f"{os.environ.get('XDG_RUNTIME_DIR', '/tmp')}/hypr/{os.environ.get('HYPRLAND_INSTANCE_SIGNATURE')}/.socket2.sock")
+    sock.connect(sock_path or f"{os.environ.get('XDG_RUNTIME_DIR', '/tmp')}/hypr/{os.environ.get('HYPRLAND_INSTANCE_SIGNATURE')}/.socket2.sock")
     while True:
         data = sock.recv(4096).decode('utf-8')
         if not data: break

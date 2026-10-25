@@ -240,6 +240,30 @@ menu separator {
   }
 }
 
+/* Center MPRIS Now-Playing Pill */
+.mpris-box {
+  background-color: #292E36;
+  border-radius: 4px;
+  padding: 2px 10px;
+  color: #B6FF2E;
+
+  &:hover {
+    background-color: #3e4451;
+  }
+
+  .mpris-icon {
+    color: #B6FF2E;
+    font-size: 13px;
+    margin-right: 4px;
+  }
+
+  .mpris-text {
+    color: #E5E9F0;
+    font-size: 12px;
+    font-weight: 500;
+  }
+}
+
 /* Common Popup Box Styling (Matches Wi-Fi Box) */
 .cal-box, .power-box, .vol-box, .wifi-box, .bt-box {
   background-color: #1F2329;
