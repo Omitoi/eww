@@ -273,9 +273,11 @@
         (for dev in {bt_list.devices}
           (button :class {dev.connected ? "bt-item connected" : "bt-item"}
                   :onclick "~/.config/eww/scripts/connect-bt.sh '${dev.mac}' &"
-            (box :orientation "h" :space-evenly false
+            (box :orientation "h" :space-evenly false :spacing 6
               (label :class "bt-item-name" :text "${dev.name}" :hexpand true :halign "start")
-              (label :class "bt-item-status" :text "${dev.connected ? 'Connected ✓' : 'Disconnected'}" :halign "end"))))))))
+              (label :class {dev.paired ? "bt-badge paired" : "bt-badge unpaired"} :text "P" :tooltip "Paired")
+              (label :class {dev.trusted ? "bt-badge trusted" : "bt-badge untrusted"} :text "T" :tooltip "Trusted")
+              (label :class "bt-item-status" :text "${dev.connected ? '✓' : '–'}" :halign "end"))))))))
 
 
 

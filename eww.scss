@@ -492,6 +492,19 @@ calendar {
   font-size: 11px;
 }
 
+.bt-badge {
+  font-size: 10px;
+  font-weight: bold;
+  padding: 1px 4px;
+  border-radius: 3px;
+  min-width: 14px;
+
+  &.paired   { color: #1F2329; background-color: #B6FF2E; }
+  &.unpaired { color: #666c76; background-color: #292E36; border: 1px solid #444; }
+  &.trusted  { color: #1F2329; background-color: #B6FF2E; }
+  &.untrusted{ color: #666c76; background-color: #292E36; border: 1px solid #444; }
+}
+
 /* On-Screen Display (OSD) Overlay Styling */
 .osd-box {
   background-color: #1F2329;
